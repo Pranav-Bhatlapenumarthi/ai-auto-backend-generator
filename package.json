@@ -1,0 +1,30 @@
+{
+  "name": "ai-auto-backend-generator",
+  "version": "1.0.0",
+  "description": "AI system that generates complete backend architectures from natural language descriptions.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pranav-Bhatlapenumarthi/ai-auto-backend-generator.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Pranav-Bhatlapenumarthi/ai-auto-backend-generator/issues"
+  },
+  "homepage": "https://github.com/Pranav-Bhatlapenumarthi/ai-auto-backend-generator#readme",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "aws-sdk": "^2.1693.0",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
