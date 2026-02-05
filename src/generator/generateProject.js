@@ -1,4 +1,3 @@
-// src/generator/generateProject.js
 const fs = require("fs");
 const path = require("path");
 const generateModels = require("./generateModels");

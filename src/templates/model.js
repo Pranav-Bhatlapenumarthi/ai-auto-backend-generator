@@ -1,4 +1,3 @@
-// src/templates/model.js
 module.exports = ({ name, fields }) => `
 const mongoose = require("mongoose");
 

@@ -1,4 +1,3 @@
-// src/generator/generateModels.js
 const fs = require("fs");
 const path = require("path");
 const modelTemplate = require("../templates/model");

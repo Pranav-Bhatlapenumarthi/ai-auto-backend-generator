@@ -1,8 +1,11 @@
-// src/app.js
 const express = require("express");
 const generateRoute = require("./routes/generate");
+const cors = require("cors");
+
 
 const app = express();
+app.use(express.json());
+app.use(cors());
 app.use(express.json());
 
 app.use("/api/generate", generateRoute);
