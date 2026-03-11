@@ -2,42 +2,35 @@ import { useState } from "react";
 import { generateBackend } from "../api";
 
 export default function GeneratorForm() {
-
-  const [jsonInput, setJsonInput] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleGenerate = async () => {
-
     try {
-
-      const spec = JSON.parse(jsonInput);
-
-      await generateBackend(spec);
-
+      setLoading(true);
+      await generateBackend({ prompt }); 
     } catch (err) {
-      alert("Invalid JSON or generation failed");
+      alert("Generation failed");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div style={{ padding: 90 }}>
-
-      <h2>Backend Generator</h2>
-
+      <h2>AI Backend Generator</h2>
       <textarea
-        rows="25"
+        rows="10"
         cols="100"
-        placeholder="Paste backend spec JSON here..."
-        value={jsonInput}
-        onChange={(e) => setJsonInput(e.target.value)}
+        placeholder="Describe the backend you want (e.g., 'An express backend for a blog with posts and comments, using MongoDB')..."
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
       />
-
       <br /><br />
-
-      <button onClick={handleGenerate}>
-        Generate Backend
+      <button onClick={handleGenerate} disabled={loading}>
+        {loading ? "Generating (This may take a minute)..." : "Generate Backend"}
       </button>
-
     </div>
   );
 }

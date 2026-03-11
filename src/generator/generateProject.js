@@ -1,26 +1,16 @@
-const fs = require("fs");
+const fs = require("fs-extra"); // Changed to fs-extra for easier directory creation
 const path = require("path");
-const generateModels = require("./generateModels");
-const generateRoutes = require("./generateRoutes.js");
-const generateControllers = require("./generateControllers");
 
-module.exports = function generateProject(spec) {
-  const basePath = path.join(
-    __dirname,
-    "..",
-    "..",
-    "temp",
-    spec.projectName
-  );
+module.exports = function generateProject(aiSpec) {
+  const projectName = aiSpec.projectName || `app-${Date.now()}`;
+  const basePath = path.join(__dirname, "..", "..", "temp", projectName);
 
-  fs.mkdirSync(basePath, { recursive: true });
-  fs.mkdirSync(path.join(basePath, "models"));
-  fs.mkdirSync(path.join(basePath, "routes"));
-  fs.mkdirSync(path.join(basePath, "controllers"));
+  fs.ensureDirSync(basePath);
 
-  generateModels(spec.entities, basePath);
-  generateRoutes(spec.entities, basePath);
-  generateControllers(spec.entities, basePath);
+  aiSpec.files.forEach(file => {
+    const fullFilePath = path.join(basePath, file.path);
+    fs.outputFileSync(fullFilePath, file.content);
+  });
 
   return basePath;
 };
