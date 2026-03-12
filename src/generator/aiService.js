@@ -1,48 +1,131 @@
-const { HfInference } = require("@huggingface/inference");
+const fetch = require("node-fetch");
 
-const hf = new HfInference(process.env.HF_TOKEN);
+const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+const MODEL = "llama-3.3-70b-versatile";
 
-async function generateBackendFromPrompt(userPrompt) {
-  const systemPrompt = `
-    You are an expert Node.js backend developer. 
-    The user will describe a backend system. 
-    You must generate the complete, fully functioning code for this backend.
-    
-    CRITICAL INSTRUCTION: You MUST respond with ONLY a valid JSON object. Do not include any explanations, greetings, or markdown blocks. Only output the raw JSON in this exact format:
-    {
-      "projectName": "generated-backend",
-      "files": [
-        {
-          "path": "package.json",
-          "content": "{ \\"name\\": \\"app\\", \\"dependencies\\": { \\"express\\": \\"^4.18.2\\" } }"
-        },
-        {
-          "path": "index.js",
-          "content": "const express = require('express');\\nconst app = express();\\napp.listen(3000);"
-        }
-      ]
-    }
-  `;
+function clean(text) {
+  if (!text) return "";
+  return text
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+}
 
-  const response = await hf.chatCompletion({
-    model: "Qwen/Qwen2.5-Coder-32B-Instruct", 
-    messages: [
-      { role: "system", content: systemPrompt },
-      { role: "user", content: userPrompt }
-    ],
-    max_tokens: 4000,
-    temperature: 0.1, 
+async function callAI(prompt, max_tokens = 1000) {
+
+  const response = await fetch(GROQ_URL, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: MODEL,
+      messages: [
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.1,
+      max_tokens
+    })
   });
 
-  const rawContent = response.choices[0].message.content;
-  const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
-  
+  const data = await response.json();
+
+  if (!data.choices) {
+    console.error("Groq Error:", data);
+    throw new Error("Groq request failed");
+  }
+
+  return data.choices[0].message.content;
+}
+
+async function generateFileStructure(userPrompt) {
+
+  const prompt = `
+You are a senior Node.js backend architect.
+
+Generate a file structure for this backend project:
+
+${userPrompt}
+
+Rules:
+- Include proper file extensions (.js, .json)
+- Return ONLY JSON
+- Do not include explanations
+
+Example format:
+
+{
+ "projectName":"api",
+ "files":[
+  "package.json",
+  "server.js",
+  "routes/users.js",
+  "controllers/usersController.js",
+  "models/User.js",
+  "middleware/auth.js",
+  "config/db.js"
+ ]
+}
+`;
+
+  const raw = await callAI(prompt, 600);
+
+  const cleaned = clean(raw);
+
+  const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+
   if (!jsonMatch) {
-    console.error("Raw AI Output:", rawContent);
-    throw new Error("Failed to extract valid JSON from the AI response.");
+    throw new Error("AI failed to generate project structure");
   }
 
   return JSON.parse(jsonMatch[0]);
+}
+
+async function generateFileContent(filePath, userPrompt) {
+
+  const prompt = `
+Generate the code for file: ${filePath}
+
+Project description:
+${userPrompt}
+
+Rules:
+- Output ONLY raw code
+- No explanations
+- No markdown
+`;
+
+  const raw = await callAI(prompt, 1200);
+
+  return clean(raw);
+}
+
+async function generateBackendFromPrompt(userPrompt) {
+
+  console.log("Generating project structure...");
+
+  const structure = await generateFileStructure(userPrompt);
+
+  const generatedFiles = [];
+
+  for (const file of structure.files) {
+
+    console.log("Generating", file);
+
+    const content = await generateFileContent(file, userPrompt);
+
+    generatedFiles.push({
+      path: file,
+      content
+    });
+
+  }
+
+  return {
+    projectName: structure.projectName || "generated-api",
+    files: generatedFiles
+  };
 }
 
 module.exports = { generateBackendFromPrompt };
