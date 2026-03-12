@@ -4,8 +4,15 @@ import { generateBackend } from "../api";
 export default function GeneratorForm() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleGenerate = async () => {
+    setError("");
+
+    if (!prompt.trim()) {
+      setError("Please enter a backend description.");
+      return;
+    }
     try {
       setLoading(true);
       await generateBackend({ prompt }); 
@@ -18,19 +25,30 @@ export default function GeneratorForm() {
   };
 
   return (
-    <div style={{ padding: 90 }}>
-      <h2>AI Backend Generator</h2>
+    <div className="generator-container">
+
+      <label className="input-label">
+        Describe the backend you want to generate
+      </label>
+
       <textarea
-        rows="10"
-        cols="100"
-        placeholder="Describe the backend you want (e.g., 'An express backend for a blog with posts and comments, using MongoDB')..."
+        className="prompt-input"
+        rows="6"
+        placeholder="Example: Create an Express backend for a blog with Post and Comment models."
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
       />
-      <br /><br />
-      <button onClick={handleGenerate} disabled={loading}>
-        {loading ? "Generating (This may take a minute)..." : "Generate Backend"}
+
+      <button
+        className="generate-btn"
+        onClick={handleGenerate}
+        disabled={loading}
+      >
+        {loading ? "Generating Backend..." : "Generate Backend"}
       </button>
+
+      {error && <div className="error-box">{error}</div>}
+
     </div>
   );
 }
