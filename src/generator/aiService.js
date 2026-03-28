@@ -1,7 +1,7 @@
 const fetch = require("node-fetch");
-
-const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL = "llama-3.3-70b-versatile";
+require("dotenv").config();
+const QWEN_URL = "https://openrouter.ai/api/v1/chat/completions";
+const MODEL = "nvidia/nemotron-3-super-120b-a12b:free";
 
 function clean(text) {
   if (!text) return "";
@@ -10,13 +10,12 @@ function clean(text) {
     .replace(/```/g, "")
     .trim();
 }
-
 async function callAI(prompt, max_tokens = 1000) {
 
-  const response = await fetch(GROQ_URL, {
+  const response = await fetch(QWEN_URL, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Authorization": `Bearer ${process.env.OPENROUTER_API}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
@@ -31,9 +30,11 @@ async function callAI(prompt, max_tokens = 1000) {
 
   const data = await response.json();
 
+  console.log("OpenRouter Raw Response:", JSON.stringify(data, null, 2));
+
   if (!data.choices) {
-    console.error("Groq Error:", data);
-    throw new Error("Groq request failed");
+    console.error("OpenRouter Error:", data);
+    throw new Error("OpenRouter request failed");
   }
 
   return data.choices[0].message.content;
@@ -67,6 +68,8 @@ Example format:
   "config/db.js"
  ]
 }
+
+Only generate the files that are mentioned here in the example format
 `;
 
   const raw = await callAI(prompt, 600);
@@ -96,7 +99,7 @@ Rules:
 - No markdown
 `;
 
-  const raw = await callAI(prompt, 1200);
+  const raw = await callAI(prompt, 900);
 
   return clean(raw);
 }
