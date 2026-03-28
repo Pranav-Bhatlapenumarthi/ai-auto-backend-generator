@@ -2,41 +2,52 @@ import { useState } from "react";
 import { generateBackend } from "../api";
 
 export default function GeneratorForm() {
-
-  const [jsonInput, setJsonInput] = useState("");
+  const [prompt, setPrompt] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleGenerate = async () => {
+    setError("");
 
+    if (!prompt.trim()) {
+      setError("Please enter a backend description.");
+      return;
+    }
     try {
-
-      const spec = JSON.parse(jsonInput);
-
-      await generateBackend(spec);
-
+      setLoading(true);
+      await generateBackend({ prompt }); 
     } catch (err) {
-      alert("Invalid JSON or generation failed");
+      alert("Generation failed");
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: 90 }}>
+    <div className="generator-container">
 
-      <h2>Backend Generator</h2>
+      <label className="input-label">
+        Describe the backend you want to generate
+      </label>
 
       <textarea
-        rows="25"
-        cols="100"
-        placeholder="Paste backend spec JSON here..."
-        value={jsonInput}
-        onChange={(e) => setJsonInput(e.target.value)}
+        className="prompt-input"
+        rows="6"
+        placeholder="Example: Create an Express backend for a blog with Post and Comment models."
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
       />
 
-      <br /><br />
-
-      <button onClick={handleGenerate}>
-        Generate Backend
+      <button
+        className="generate-btn"
+        onClick={handleGenerate}
+        disabled={loading}
+      >
+        {loading ? "Generating Backend..." : "Generate Backend"}
       </button>
+
+      {error && <div className="error-box">{error}</div>}
 
     </div>
   );

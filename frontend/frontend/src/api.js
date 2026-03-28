@@ -1,15 +1,16 @@
-export async function generateBackend(spec) {
+export async function generateBackend(prompt) {
 
   const response = await fetch("http://localhost:3000/api/generate", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(spec)
+    body: JSON.stringify({prompt})
   });
 
   if (!response.ok) {
-    throw new Error("Generation failed");
+    const err = await response.json();
+    throw new Error(err.Error||"Generation failed");
   }
 
   const blob = await response.blob();

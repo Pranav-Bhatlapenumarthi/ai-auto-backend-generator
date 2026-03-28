@@ -1,26 +1,40 @@
-const fs = require("fs");
+const fs = require("fs-extra");
 const path = require("path");
-const generateModels = require("./generateModels");
-const generateRoutes = require("./generateRoutes.js");
-const generateControllers = require("./generateControllers");
 
-module.exports = function generateProject(spec) {
-  const basePath = path.join(
-    __dirname,
-    "..",
-    "..",
-    "temp",
-    spec.projectName
-  );
+module.exports = function generateProject(aiSpec) {
 
-  fs.mkdirSync(basePath, { recursive: true });
-  fs.mkdirSync(path.join(basePath, "models"));
-  fs.mkdirSync(path.join(basePath, "routes"));
-  fs.mkdirSync(path.join(basePath, "controllers"));
+  const projectName = aiSpec.projectName || `app-${Date.now()}`;
 
-  generateModels(spec.entities, basePath);
-  generateRoutes(spec.entities, basePath);
-  generateControllers(spec.entities, basePath);
+  const basePath = path.join(__dirname, "..", "..", "temp", projectName);
+
+  // remove old project if it exists
+  fs.removeSync(basePath);
+
+  // recreate base directory
+  fs.ensureDirSync(basePath);
+
+  aiSpec.files.forEach(file => {
+
+    if (!file.path) return;
+
+    const normalizedPath = file.path.replace(/\\/g, "/");
+
+    // ignore invalid entries (no extension)
+    if (!normalizedPath.includes(".")) return;
+
+    const fullFilePath = path.join(basePath, normalizedPath);
+
+    const dir = path.dirname(fullFilePath);
+
+    // create directory safely
+    fs.ensureDirSync(dir);
+
+    // write file
+    fs.writeFileSync(fullFilePath, file.content || "", "utf8");
+
+    console.log("Writing:", normalizedPath);
+
+  });
 
   return basePath;
 };
