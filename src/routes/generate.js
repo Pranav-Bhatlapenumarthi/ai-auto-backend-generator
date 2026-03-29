@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const archiver = require("archiver");
 const generateProject = require("../generator/generateProject");
+const cors = require("cors");
 
 // Add this line to import the AI service!
 const { generateBackendFromPrompt } = require("../generator/aiService");
