@@ -11,8 +11,6 @@ app.use(cors({
   methods: ["GET", "POST"],
   allowedHeaders: ["Content-Type"]
 }));
-console.log("API KEY:", process.env.OPENROUTER_API);
-
 app.use("/api/generate", generateRoute);
 
 app.get("/", (req, res) => {
