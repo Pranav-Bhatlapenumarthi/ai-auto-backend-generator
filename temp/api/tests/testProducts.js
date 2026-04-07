@@ -66,6 +66,12 @@ describe('PUT /products/:id', () => {
     const response = await request(app).put('/products/999').send(product);
     expect(response.status).toBe(404);
   });
+
+  it('should return 400 if product data is invalid', async () => {
+    const product = { name: 'Updated Product' };
+    const response = await request(app).put('/products/1').send(product);
+    expect(response.status).toBe(400);
+  });
 });
 
 describe('DELETE /products/:id', () => {

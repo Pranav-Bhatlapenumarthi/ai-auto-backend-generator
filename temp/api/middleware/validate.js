@@ -1,15 +1,13 @@
 javascript
-const validate = (req, res, next) => {
-  const { body } = req;
-  const requiredFields = ['name', 'email', 'password'];
-
-  requiredFields.forEach((field) => {
-    if (!body[field]) {
-      return res.status(400).json({ message: `Field ${field} is required` });
+const validate = (schema) => {
+  return async (req, res, next) => {
+    try {
+      await schema.validate(req.body);
+      next();
+    } catch (error) {
+      res.status(400).json({ message: error.message });
     }
-  });
-
-  next();
+  };
 };
 
 module.exports = validate;

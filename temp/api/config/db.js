@@ -1,3 +1,4 @@
+javascript
 const dbConfig = {
   development: {
     username: 'root',

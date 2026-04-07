@@ -2,6 +2,7 @@ const express = require("express");
 const fs = require("fs");
 const archiver = require("archiver");
 const generateProject = require("../generator/generateProject");
+const validateProject = require("../generator/validateProject");
 const { generateBackendFromPrompt } = require("../generator/aiService");
 
 
@@ -15,7 +16,7 @@ router.post("/", async (req, res) => {
 
     
     if (MOCK_AI) {
-      console.log("🛠️ MOCK_AI is TRUE: Running DUMMY script for load testing...");
+      console.log(" MOCK_AI is TRUE: Running DUMMY script for load testing...");
       
       await new Promise(resolve => setTimeout(resolve, 2000)); 
       
@@ -30,16 +31,29 @@ router.post("/", async (req, res) => {
       });
     }
 
+    
     if (!prompt) {
       return res.status(400).json({ error: "Prompt is required" });
     }
 
     console.log("Generating backend via AI...");
     const aiGeneratedSpec = await generateBackendFromPrompt(prompt);
-
     
     console.log("Writing files to disk...");
     const outputPath = generateProject(aiGeneratedSpec);
+
+    
+    console.log("Validating generated code...");
+    try {
+        validateProject(outputPath);
+    } catch (validationError) {
+        console.error("Validation failed:", validationError.message);
+        // If validation fails, stop the zip process and return an error
+        return res.status(500).json({ 
+            error: "The AI generated invalid code with syntax errors. Please try a different prompt.",
+            details: validationError.message 
+        });
+    }
     
     
     const zipPath = `${outputPath}.zip`;
