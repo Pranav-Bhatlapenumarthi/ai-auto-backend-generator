@@ -15,7 +15,7 @@ router.post("/", async (req, res) => {
 
     
     if (MOCK_AI) {
-      console.log("🛠️ MOCK_AI is TRUE: Running DUMMY script for load testing...");
+      console.log("MOCK_AI is TRUE: Running DUMMY script for load testing...");
       
       await new Promise(resolve => setTimeout(resolve, 2000)); 
       

@@ -30,7 +30,7 @@ async function callAI(prompt, max_tokens = 1000) {
 
   const data = await response.json();
 
-  console.log("OpenRouter Raw Response:", JSON.stringify(data, null, 2));
+  //console.log("OpenRouter Raw Response:", JSON.stringify(data, null, 2));
 
   if (!data.choices) {
     console.error("OpenRouter Error:", data);
