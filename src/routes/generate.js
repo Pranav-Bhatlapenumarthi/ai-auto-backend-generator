@@ -6,7 +6,7 @@ const validateProject = require("../generator/validateProject");
 const { generateBackendFromPrompt } = require("../generator/aiService");
 
 
-const MOCK_AI = true;
+const MOCK_AI = false;
 
 const router = express.Router();
 
