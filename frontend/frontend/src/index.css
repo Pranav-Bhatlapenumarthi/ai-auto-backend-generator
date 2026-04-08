@@ -1,68 +1,252 @@
+/* ==========================================
+   BRIGHT THEME & RESET
+   ========================================== */
 :root {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color-scheme: light;
+  color: #1e293b; /* Dark text for bright background */
+  background-color: #faf9f6; /* Off-white paper color */
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Hide the default cursor so our custom one works */
+* {
+  cursor: none !important;
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
   min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
+a {
   font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+  color: #6366f1;
+  text-decoration: inherit;
 }
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+a:hover {
+  color: #4f46e5;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+/* ==========================================
+   APP LAYOUT & LIGHT GLASSMORPHISM
+   ========================================== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  width: 100%;
+  max-width: 800px;
+  padding: 2rem;
+  z-index: 10;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7); /* Translucent white */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 1);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08); /* Soft dark shadow */
+}
+
+.header {
+  text-align: center;
+  padding: 1rem;
+}
+
+.header h1 {
+  margin: 0 0 0.5rem 0;
+  font-size: 3em;
+  line-height: 1.1;
+  color: #0f172a;
+  letter-spacing: -1px;
+}
+
+.header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 1.1rem;
+}
+
+/* ==========================================
+   FORM CONTROLS
+   ========================================== */
+.generator-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-label {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.prompt-input {
+  width: 100%;
+  padding: 1.2rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: rgba(255, 255, 255, 0.9);
+  color: #0f172a;
+  font-size: 1.05rem;
+  font-family: inherit;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.prompt-input::placeholder {
+  color: #94a1b8;
+}
+
+.prompt-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  background: #ffffff;
+}
+
+.prompt-input:disabled {
+  opacity: 0.6;
+  background: #f1f5f9;
+}
+
+/* ==========================================
+   BUTTON & LOADING SPINNER
+   ========================================== */
+.generate-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  background: #6366f1;
+  color: white;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: none;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  width: 100%;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.generate-btn:hover:not(:disabled) {
+  background: #4f46e5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+}
+
+.generate-btn:disabled {
+  background: #94a1b8;
+  color: #f1f5f9;
+  transform: none;
+  box-shadow: none;
+}
+
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================
+   STATUS BOXES (SUCCESS & ERROR)
+   ========================================== */
+.status-box {
+  padding: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  font-weight: 600;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.error-box {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.success-box {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #bbf7d0;
+}
+
+@keyframes popIn {
+  0% { opacity: 0; transform: translateY(-15px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   CUSTOM DYNAMIC CURSOR
+   ========================================== */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  
+  /* 1. Default State (Outside Form): Big and Filled */
+  width: 60px;
+  height: 60px;
+  background: rgba(99, 102, 241, 0.15); /* Soft indigo fill */
+  border: 2px solid rgba(99, 102, 241, 0.5); /* Indigo border */
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  
+  /* Keeps the 60px circle perfectly centered on the mouse */
+  margin-top: -30px; 
+  margin-left: -30px;
+  
+  /* Smoothly animates the morphing effect */
+  transition: transform 0.1s ease-out, width 0.3s cubic-bezier(0.25, 1, 0.5, 1), height 0.3s cubic-bezier(0.25, 1, 0.5, 1), margin 0.3s cubic-bezier(0.25, 1, 0.5, 1), background 0.3s ease, border-color 0.3s ease;
+}
+
+/* 2. Hover State (Inside Form): Small and Hollow */
+body:has(.generator-container:hover) .custom-cursor {
+  width: 24px;
+  height: 24px;
+  background: transparent; /* Makes it hollow */
+  border: 2px solid rgba(15, 23, 42, 0.8); /* Dark slate outline */
+  
+  /* Re-centers the new 24px size */
+  margin-top: -12px;
+  margin-left: -12px;
+}
+
+/* 3. Click State: Shrinks slightly when you click */
+body:active .custom-cursor {
+  transform: scale(0.85);
+}
+
+/* ==========================================
+   FOOTER
+   ========================================== */
+.footer {
+  text-align: center;
+  color: #64748b;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  font-weight: 500;
 }

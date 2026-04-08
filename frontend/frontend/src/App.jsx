@@ -1,18 +1,23 @@
+// src/App.jsx
 import GeneratorForm from "./components/GeneratorForm";
+import LiveBackground from "./components/LiveBackground";
 
 export default function App() {
   return (
-    <div className="app-container">
-      <header className="header">
-        <h1>AI Auto Backend Generator</h1>
-        <p>Generate production-ready backend scaffolding instantly.</p>
-      </header>
+    <>
+      <LiveBackground />
+      <div className="app-container">
+        <header className="header glass-panel">
+          <h2>AI Auto Backend</h2>
+          <p>Generate production-ready scaffolding instantly.</p>
+        </header>
 
-      <GeneratorForm />
+        <GeneratorForm />
 
-      <footer className="footer">
-        <p>Powered by Node.js + Express + AI Backend Generator</p>
-      </footer>
-    </div>
+        <footer className="footer">
+          
+        </footer>
+      </div>
+    </>
   );
 }
